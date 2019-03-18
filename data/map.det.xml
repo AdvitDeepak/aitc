@@ -1,0 +1,14 @@
+<additional>
+	<inductionLoop id='393627613_0loop' lane='393627613_0' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='393627613_1loop' lane='393627613_1' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='393627613_2loop' lane='393627613_2' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='393645129_0loop' lane='393645129_0' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='393645129_1loop' lane='393645129_1' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='393645129_2loop' lane='393645129_2' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393625777_0loop' lane='-393625777_0' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393625777_1loop' lane='-393625777_1' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393625777_2loop' lane='-393625777_2' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393645126_0loop' lane='-393645126_0' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393645126_1loop' lane='-393645126_1' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+	<inductionLoop id='-393645126_2loop' lane='-393645126_2' pos='-5' freq='100' file='..\resultsOfDetectors.xml'/>
+</additional>

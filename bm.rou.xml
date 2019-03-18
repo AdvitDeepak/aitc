@@ -1,0 +1,213 @@
+<routes>
+        <vType id="slow" accel="3" decel="4" sigma="0.5" length="5.5" width="2.3" minGap="2.5" maxSpeed="15" guiShape="delivery" color="1,0.84314,0.14902" />
+        <vType id="fast" accel="3.5" decel="4.572" sigma="0.5" length="4.2" width="1.9" minGap="2.5" maxSpeed="16.2" guiShape="passenger" color="1,0.84314,0.14902" />
+        <vType id="norm" accel="4" decel="5.15" sigma="0.5" length="4.8" width="2.1" minGap="2.5" maxSpeed="15.6" guiShape="passenger/van" color="1,0.84314,0.14902" />
+
+        <route id="NL" edges="393645138 393645129 393625777" />
+        <route id="NT" edges="393645138 393645129 393645126 393645137" />
+        <route id="NR" edges="393645138 393645129 -393627613" />
+        <route id="SL" edges="-393645137 -393645126 -393627613" />
+        <route id="ST" edges="-393645137 -393645126 -393645129 -393645138" />
+        <route id="SR" edges="-393645137 -393645126 393625777" />
+        <route id="ER" edges="-393625777 -393645129 -393645138" />
+        <route id="ET" edges="-393625777 -393627613" />
+        <route id="EL" edges="-393625777 393645126 393645137 " />
+        <route id="WL" edges="393627613 -393645129 -393645138" />
+        <route id="WT" edges="393627613 393625777" />
+		    <route id="WR" edges="393627613 393645126 393645137" />
+    <vehicle id="through_0" type="fast" route="NT" depart="2" />
+    <vehicle id="right_1" type="fast" route="WR" depart="2" />
+    <vehicle id="through_2" type="fast" route="ST" depart="3" />
+    <vehicle id="through_3" type="fast" route="WT" depart="3" />
+    <vehicle id="through_4" type="fast" route="ST" depart="4" />
+    <vehicle id="through_5" type="norm" route="WT" depart="5" />
+    <vehicle id="through_6" type="fast" route="NT" depart="8" />
+    <vehicle id="through_7" type="fast" route="NT" depart="9" />
+    <vehicle id="through_8" type="fast" route="ST" depart="9" />
+    <vehicle id="left_9" type="fast" route="WL" depart="9" />
+    <vehicle id="through_10" type="norm" route="ST" depart="10" />
+    <vehicle id="right_11" type="norm" route="SR" depart="10"/>
+    <vehicle id="left_12" type="slow" route="NL" depart="11" />
+    <vehicle id="left_13" type="slow" route="WL" depart="11" />
+    <vehicle id="through_14" type="slow" route="WT" depart="11" />
+    <vehicle id="through_15" type="fast" route="NT" depart="14" />
+    <vehicle id="through_16" type="fast" route="ST" depart="14" />
+    <vehicle id="left_17" type="norm" route="EL" depart="15" />
+    <vehicle id="through_18" type="slow" route="ET" depart="16" />
+    <vehicle id="through_19" type="slow" route="WT" depart="16" />
+    <vehicle id="through_20" type="fast" route="WT" depart="17" />
+    <vehicle id="through_21" type="fast" route="NT" depart="18" />
+    <vehicle id="left_22" type="fast" route="WL" depart="18" />
+    <vehicle id="through_23" type="fast" route="NT" depart="19" />
+    <vehicle id="right_24" type="norm" route="ER" depart="20" />
+    <vehicle id="left_25" type="slow" route="SL" depart="21" />
+    <vehicle id="right_26" type="fast" route="NR" depart="22" />
+    <vehicle id="through_27" type="fast" route="WT" depart="22" />
+    <vehicle id="through_28" type="fast" route="NT" depart="24" />
+    <vehicle id="through_29" type="norm" route="ET" depart="25" />
+    <vehicle id="through_30" type="norm" route="WT" depart="25" />
+    <vehicle id="left_31" type="fast" route="NL" depart="27" />
+    <vehicle id="through_32" type="fast" route="NT" depart="28" />
+    <vehicle id="left_33" type="norm" route="NL" depart="30" />
+    <vehicle id="through_34" type="norm" route="NT" depart="30" />
+    <vehicle id="through_35" type="slow" route="NT" depart="31" />
+    <vehicle id="right_36" type="slow" route="NR" depart="31" />
+    <vehicle id="left_37" type="fast" route="EL" depart="33" />
+    <vehicle id="through_38" type="fast" route="WT" depart="33" />
+    <vehicle id="through_39" type="fast" route="ST" depart="34" />
+    <vehicle id="through_40" type="fast" route="WT" depart="34" />
+    <vehicle id="left_41" type="slow" route="NL" depart="36" />
+    <vehicle id="through_42" type="fast" route="WT" depart="38" />
+    <vehicle id="through_43" type="norm" route="NT" depart="40" />
+    <vehicle id="through_44" type="norm" route="WT" depart="40" />
+    <vehicle id="through_45" type="slow" route="NT" depart="41" />
+    <vehicle id="right_46" type="slow" route="ER" depart="41" />
+    <vehicle id="through_47" type="slow" route="WT" depart="41" />
+    <vehicle id="through_48" type="fast" route="NT" depart="42" />
+    <vehicle id="right_49" type="fast" route="ER" depart="42" />
+    <vehicle id="through_50" type="fast" route="WT" depart="42" />
+    <vehicle id="through_51" type="fast" route="NT" depart="43" />
+    <vehicle id="through_52" type="fast" route="NT" depart="44" />
+    <vehicle id="right_53" type="norm" route="NR" depart="45" />
+    <vehicle id="through_54" type="norm" route="ST" depart="45" />
+    <vehicle id="through_55" type="norm" route="WT" depart="45" />
+    <vehicle id="through_56" type="slow" route="NT" depart="46" />
+    <vehicle id="through_57" type="slow" route="WT" depart="46" />
+    <vehicle id="through_58" type="fast" route="ET" depart="48" />
+    <vehicle id="through_59" type="fast" route="WT" depart="48" />
+    <vehicle id="right_60" type="norm" route="NR" depart="50" />
+    <vehicle id="through_61" type="slow" route="NT" depart="51" />
+    <vehicle id="left_62" type="fast" route="NL" depart="54" />
+    <vehicle id="right_63" type="fast" route="SR" depart="54"/>
+    <vehicle id="right_64" type="fast" route="ER" depart="54" />
+    <vehicle id="through_65" type="fast" route="WT" depart="54" />
+    <vehicle id="left_66" type="norm" route="SL" depart="55" />
+    <vehicle id="through_67" type="norm" route="ST" depart="55" />
+    <vehicle id="through_68" type="slow" route="NT" depart="56" />
+    <vehicle id="through_69" type="fast" route="WT" depart="57" />
+    <vehicle id="through_70" type="fast" route="NT" depart="58" />
+    <vehicle id="through_71" type="norm" route="NT" depart="60" />
+    <vehicle id="left_72" type="norm" route="SL" depart="60" />
+    <vehicle id="through_73" type="slow" route="NT" depart="61" />
+    <vehicle id="through_74" type="slow" route="ET" depart="61" />
+    <vehicle id="through_75" type="fast" route="NT" depart="62" />
+    <vehicle id="right_76" type="fast" route="NR" depart="63" />
+    <vehicle id="through_77" type="fast" route="ET" depart="63" />
+    <vehicle id="through_78" type="fast" route="NT" depart="64" />
+    <vehicle id="right_79" type="fast" route="SR" depart="64"/>
+    <vehicle id="through_80" type="slow" route="NT" depart="66" />
+    <vehicle id="through_81" type="slow" route="WT" depart="66" />
+    <vehicle id="through_82" type="fast" route="ET" depart="68" />
+    <vehicle id="left_83" type="fast" route="NL" depart="69" />
+    <vehicle id="through_84" type="norm" route="ET" depart="70" />
+    <vehicle id="through_85" type="slow" route="WT" depart="71" />
+    <vehicle id="through_86" type="fast" route="NT" depart="73" />
+    <vehicle id="left_87" type="fast" route="SL" depart="73" />
+    <vehicle id="through_88" type="fast" route="ST" depart="73" />
+    <vehicle id="through_89" type="fast" route="ET" depart="73" />
+    <vehicle id="right_90" type="norm" route="NR" depart="75" />
+    <vehicle id="left_91" type="norm" route="EL" depart="75" />
+    <vehicle id="through_92" type="slow" route="ST" depart="76" />
+    <vehicle id="through_93" type="slow" route="WT" depart="76" />
+    <vehicle id="right_94" type="fast" route="ER" depart="77" />
+    <vehicle id="through_95" type="fast" route="WT" depart="77" />
+    <vehicle id="through_96" type="fast" route="NT" depart="78" />
+    <vehicle id="left_97" type="fast" route="WL" depart="79" />
+    <vehicle id="right_98" type="slow" route="WR" depart="81" />
+    <vehicle id="left_99" type="fast" route="WL" depart="82" />
+    <vehicle id="through_100" type="fast" route="WT" depart="82" />
+    <vehicle id="through_101" type="fast" route="NT" depart="84" />
+    <vehicle id="through_102" type="slow" route="WT" depart="86" />
+    <vehicle id="right_103" type="fast" route="SR" depart="89"/>
+    <vehicle id="right_104" type="norm" route="NR" depart="90" />
+    <vehicle id="right_105" type="norm" route="ER" depart="90" />
+    <vehicle id="right_106" type="slow" route="NR" depart="91" />
+    <vehicle id="through_107" type="fast" route="ET" depart="92" />
+    <vehicle id="through_108" type="fast" route="NT" depart="93" />
+    <vehicle id="left_109" type="fast" route="SL" depart="93" />
+    <vehicle id="through_110" type="fast" route="WT" depart="93" />
+    <vehicle id="through_111" type="fast" route="NT" depart="94" />
+    <vehicle id="right_112" type="norm" route="NR" depart="95" />
+    <vehicle id="through_113" type="norm" route="WT" depart="95" />
+    <vehicle id="through_114" type="slow" route="ET" depart="96" />
+    <vehicle id="right_115" type="fast" route="SR" depart="97"/>
+    <vehicle id="through_116" type="fast" route="ET" depart="97" />
+    <vehicle id="right_117" type="fast" route="NR" depart="98" />
+    <vehicle id="through_118" type="fast" route="ET" depart="98" />
+    <vehicle id="through_119" type="fast" route="ST" depart="99" />
+    <vehicle id="right_120" type="norm" route="NR" depart="100" />
+    <vehicle id="through_121" type="norm" route="ET" depart="100" />
+    <vehicle id="through_122" type="slow" route="ET" depart="101" />
+    <vehicle id="through_123" type="fast" route="NT" depart="102" />
+    <vehicle id="right_124" type="fast" route="NR" depart="103" />
+    <vehicle id="through_125" type="fast" route="NT" depart="104" />
+    <vehicle id="left_126" type="fast" route="SL" depart="104" />
+    <vehicle id="through_127" type="fast" route="ET" depart="104" />
+    <vehicle id="through_128" type="fast" route="WT" depart="104" />
+    <vehicle id="right_129" type="norm" route="SR" depart="105"/>
+    <vehicle id="through_130" type="norm" route="WT" depart="105" />
+    <vehicle id="through_131" type="slow" route="NT" depart="106" />
+    <vehicle id="right_132" type="fast" route="SR" depart="107"/>
+    <vehicle id="through_133" type="fast" route="NT" depart="108" />
+    <vehicle id="right_134" type="fast" route="SR" depart="108"/>
+    <vehicle id="through_135" type="norm" route="NT" depart="110" />
+    <vehicle id="through_136" type="slow" route="NT" depart="111" />
+    <vehicle id="through_137" type="fast" route="NT" depart="112" />
+    <vehicle id="through_138" type="fast" route="WT" depart="112" />
+    <vehicle id="through_139" type="fast" route="WT" depart="114" />
+    <vehicle id="through_140" type="slow" route="NT" depart="116" />
+    <vehicle id="right_141" type="fast" route="NR" depart="117" />
+    <vehicle id="right_142" type="fast" route="NR" depart="118" />
+    <vehicle id="through_143" type="fast" route="WT" depart="119" />
+    <vehicle id="through_144" type="norm" route="NT" depart="120" />
+    <vehicle id="right_145" type="norm" route="NR" depart="120" />
+    <vehicle id="through_146" type="norm" route="WT" depart="120" />
+    <vehicle id="right_147" type="slow" route="SR" depart="121"/>
+    <vehicle id="through_148" type="fast" route="ST" depart="122" />
+    <vehicle id="through_149" type="fast" route="NT" depart="123" />
+    <vehicle id="through_150" type="fast" route="NT" depart="127" />
+    <vehicle id="through_151" type="fast" route="WT" depart="127" />
+    <vehicle id="through_152" type="fast" route="ST" depart="128" />
+    <vehicle id="left_153" type="fast" route="EL" depart="128" />
+    <vehicle id="through_154" type="fast" route="WT" depart="128" />
+    <vehicle id="through_155" type="fast" route="NT" depart="129" />
+    <vehicle id="through_156" type="fast" route="ST" depart="129" />
+    <vehicle id="through_157" type="slow" route="WT" depart="131" />
+    <vehicle id="right_158" type="fast" route="NR" depart="133" />
+    <vehicle id="through_159" type="fast" route="ST" depart="133" />
+    <vehicle id="left_160" type="norm" route="NL" depart="135" />
+    <vehicle id="through_161" type="fast" route="NT" depart="137" />
+    <vehicle id="through_162" type="fast" route="WT" depart="138" />
+    <vehicle id="left_163" type="norm" route="SL" depart="140" />
+    <vehicle id="through_164" type="norm" route="WT" depart="140" />
+    <vehicle id="right_165" type="slow" route="ER" depart="141" />
+    <vehicle id="through_166" type="fast" route="ST" depart="142" />
+    <vehicle id="through_167" type="fast" route="WT" depart="143" />
+    <vehicle id="left_168" type="fast" route="SL" depart="144" />
+    <vehicle id="through_169" type="norm" route="WT" depart="145" />
+    <vehicle id="left_170" type="slow" route="NL" depart="146" />
+    <vehicle id="through_171" type="fast" route="NT" depart="149" />
+    <vehicle id="through_172" type="slow" route="NT" depart="151" />
+    <vehicle id="through_173" type="slow" route="WT" depart="151" />
+    <vehicle id="right_174" type="fast" route="WR" depart="153" />
+    <vehicle id="through_175" type="norm" route="NT" depart="155" />
+    <vehicle id="right_176" type="fast" route="NR" depart="157" />
+    <vehicle id="through_177" type="fast" route="WT" depart="157" />
+    <vehicle id="through_178" type="fast" route="NT" depart="159" />
+    <vehicle id="right_179" type="fast" route="NR" depart="159" />
+    <vehicle id="through_180" type="fast" route="WT" depart="159" />
+    <vehicle id="through_181" type="norm" route="NT" depart="160" />
+    <vehicle id="left_182" type="fast" route="NL" depart="164" />
+    <vehicle id="through_183" type="fast" route="NT" depart="164" />
+    <vehicle id="right_184" type="fast" route="SR" depart="164"/>
+    <vehicle id="through_185" type="norm" route="NT" depart="165" />
+    <vehicle id="left_186" type="norm" route="SL" depart="165" />
+    <vehicle id="right_187" type="slow" route="SR" depart="166"/>
+    <vehicle id="through_188" type="slow" route="WT" depart="166" />
+    <vehicle id="through_189" type="fast" route="WT" depart="167" />
+    <vehicle id="through_190" type="norm" route="NT" depart="170" />
+    <vehicle id="through_191" type="slow" route="NT" depart="171" />
+    <vehicle id="through_192" type="slow" route="WT" depart="171" />
+    <vehicle id="through_193" type="fast" route="NT" depart="172" />
+    <vehicle id="through_194" type="fast" route="ET" depart="172" />
+</routes>
