@@ -1,5 +1,5 @@
 import numpy as np
-import os, sys, time, traci, shutil
+import os, sys, time, traci, shutil, random, argparse
 from models.dqn import Dqn
 from models.fixed import Fixed
 
@@ -10,7 +10,6 @@ from utilities.util import num_cars_halted_other_directions
 from utilities.util import fail_safe
 
 import xml.etree.ElementTree as ET
-import random, argparse
 
 
 # Process and store options
