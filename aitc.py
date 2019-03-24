@@ -1,6 +1,5 @@
 import numpy as np
-import os, sys, time, traci
-import shutil
+import os, sys, time, traci, shutil
 from models.dqn import Dqn
 from models.fixed import Fixed
 
