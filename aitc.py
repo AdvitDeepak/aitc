@@ -334,7 +334,7 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
         agent.replay()
 
 
-    if (simulation % 1000 == 0) & (simulation != 0):
+    if (simulation % global_consts.WeightDumpInterval == 0) & (simulation != 0):
         agent.save(global_consts.OutputDir + "./traffic" + repr(simulation) + ".h5")
 
     return (sim_step, lost_time)

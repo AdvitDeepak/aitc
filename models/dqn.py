@@ -22,7 +22,7 @@ class Dqn:
         self.exploration_decay = 0.999995
         self.min_exploration = 0.01
         self.memory = deque(maxlen=2000)
-        self.batch_size = 40
+        self.batch_size = 200
         self.gamma = 0.94
         self.predictor = False;
         self.predictor_action =[];
@@ -75,8 +75,10 @@ class Dqn:
 
     def replay(self):
         #print(repr(self.memory))
-        #minibatch = random.sample(list(self.memory), self.batch_size)
-        for state, action, reward, next_state in list(self.memory):
+        if len(self.memory) < self.batch_size:
+            return
+        minibatch = random.sample(list(self.memory), self.batch_size)
+        for state, action, reward, next_state in minibatch:
             target = reward + self.gamma*np.max(self.regressor.predict(next_state)[0])
             target_f = self.regressor.predict(state)
             self.predictor_action = target_f
@@ -84,7 +86,6 @@ class Dqn:
             self.regressor.fit(state, target_f, epochs=1, verbose=0)
         if self.exploration > self.min_exploration:
             self.exploration *= self.exploration_decay
-        self.memory.clear()
 
     def load(self, name):
         self.regressor.load_weights(name)

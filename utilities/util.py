@@ -18,6 +18,7 @@ class global_consts:
     GenMapCmd = "python ./utilities/generateMap.py"
     OutputDir = "output"
     BenchMarkOutFile = "bm.txt"
+    WeightDumpInterval = 100
     MapFile = "data/map.rou.xml"
     Lanes = {
         'lane1':"-393625777_0", 'lane2':"-393625777_1", 'lane3':"-393625777_2",
