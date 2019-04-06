@@ -158,42 +158,42 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
         halt = traci.lane.getLastStepHaltingNumber(lane)
         state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber('lane11a')
+    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane11a'])
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber('lane11b')
+    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane11b'])
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber('lane7a')
+    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane7a'])
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber('lane7b')
+    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane7b'])
     state.append(halt)
 
     #change to match logic for cars halted
-    behind = traci.lane.getLastStepVehicleNumber('lane1') + traci.lane.getLastStepVehicleNumber('lane2')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane1']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane2'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane3')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane3'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane4') + traci.lane.getLastStepVehicleNumber('lane5')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane4']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane5'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane6')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane6'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane7a') + traci.lane.getLastStepVehicleNumber('lane8') + traci.lane.getLastStepVehicleNumber('lane10')
-    if (traci.lane.getLastStepVehicleNumber('lane10') >= 5):
-        behind += traci.lane.getLastStepVehicleNumber('lane7b')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane8']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane10'])
+    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane10']) >= 5):
+        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7b'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane9')
-    if (traci.lane.getLastStepVehicleNumber('lane9') >= 5):
-        behind += traci.lane.getLastStepVehicleNumber('lane7b')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane9'])
+    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane9']) >= 5):
+        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7b'])
     state.append(behind)
-    behind = traci.edge.getLastStepVehicleNumber('lane11a') + traci.lane.getLastStepVehicleNumber('lane12') + traci.lane.getLastStepVehicleNumber('lane14')
-    if (traci.lane.getLastStepVehicleNumber('lane14') >= 5):
-        behind += traci.lane.getLastStepVehicleNumber('lane11b')
+    behind = traci.edge.getLastStepVehicleNumber(global_consts.Lanes['lane11a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane12']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14'])
+    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14']) >= 5):
+        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13'])
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber('lane13')
-    if (traci.lane.getLastStepVehicleNumber('lane13') >= 5):
-        behind += traci.lane.getLastStepVehicleNumber('lane11b')
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13'])
+    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13']) >= 5):
+        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane11b'])
     state.append(behind)
 
     # current phase (1 val)
