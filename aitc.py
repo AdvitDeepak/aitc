@@ -26,7 +26,7 @@ class Options:
         self.train = 20000
         self.demo = ""
         self.mapfile = ""
-        self.switch_factor = 16
+        self.switch_factor = 1
         self.log = ""
         self.verbosity = 1
         self.check = 1
@@ -232,18 +232,13 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
             predictor_count = predictor_count + 1
 
         curr_phase = traci.trafficlights.getPhase(global_consts.TrafficLightId)
-        new_phase = action * 2
+        new_phase = get_phase(action)
         phase_changed = False
         if(curr_phase != new_phase):
             phase_changed = True
 
         new_halt = num_cars_halted_other_directions(curr_phase)
         old_halt = new_halt
-        if options.check == 1:
-            if (passed/(phase_time + 1) < 0.1 and phase_time > 35) or (phase_time >= 7 and passed == 0) or phase_time > 50:
-                new_phase = curr_phase + 2
-                if new_phase == 16:
-                    new_phase = 0
 
         if(phase_changed):
             passed = 0
@@ -279,7 +274,7 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         reward = calc_reward(old_halt, new_halt, new_passed, reward_factor)
         #reward = (halted_delta)+(1.5*(passed_delta))
-        
+
         total_passed += new_passed
         total_reward += reward
 
