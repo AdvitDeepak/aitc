@@ -21,3 +21,11 @@ bm.rou.xml: A benchmark traffic pattern (route) file for SUMO
 README: this file
 t39K.h5: A tensorflow neural network trained weights file for the dqn model 
 
+State (21 input values):
+8: # Halted in each direction (Left and Through for each side)
+8: # in each direction (do not have to be halted, Left and Through for each side)
+1: Current Phase
+1: Elapsed Phase Time
+1: Rate of cars passed for phase time
+1: Change in # halted
+1: Change in # passed
