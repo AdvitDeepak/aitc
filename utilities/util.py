@@ -187,7 +187,7 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
     if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane9']) >= 5):
         behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7b'])
     state.append(behind)
-    behind = traci.edge.getLastStepVehicleNumber(global_consts.Lanes['lane11a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane12']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14'])
+    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane11a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane12']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14'])
     if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14']) >= 5):
         behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13'])
     state.append(behind)

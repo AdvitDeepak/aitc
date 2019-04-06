@@ -9,6 +9,7 @@ from utilities.util import get_state
 from utilities.util import global_consts
 from utilities.util import num_cars_halted_other_directions
 from utilities.util import fail_safe
+from utilities.util import get_phase
 
 import xml.etree.ElementTree as ET
 # Finished imports
