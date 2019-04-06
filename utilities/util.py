@@ -3,13 +3,13 @@ import numpy as np
 
 class global_consts:
     ProgramName = "AITC"
-    Version = "1.0"
+    Version = "1.1"
     TrafficLightId = "65616300"
     # Declare all globals in capital
     SumoConfig = "data/map.sumocfg"
     SumoCmd = ["sumo", "-c", SumoConfig, "--tripinfo-output", "data/tripinfo.xml",  "--start", "--no-warnings", "--time-to-teleport", "-1"]
     SumoCmd_GUI = ["sumo-gui", "-c", SumoConfig, "--tripinfo-output", "data/tripinfo.xml",  "--no-warnings", "--time-to-teleport", "-1"]
-    StateSize = 19
+    StateSize = 29
     ActionSize = 8
     PhaseToActionRatio = 2
     MaxNumVehicleSeed = 400
@@ -22,9 +22,9 @@ class global_consts:
     MapFile = "data/map.rou.xml"
     Lanes = {
         'lane1':"-393625777_0", 'lane2':"-393625777_1", 'lane3':"-393625777_2",
-        'lane4':"393627613_0",  'lane5':"393627613_1", 'lane6':"393627613_2",
-        'lane7':"-393645137",   'lane8':"-393645126_0", 'lane9':"-393645126_2",
-        'lane10':"-393645126_1", 'lane11':"393645138",   'lane12':"393645129_0",
+        'lane4':"393627613_0", 'lane5':"393627613_1", 'lane6':"393627613_2",
+        'lane7a':"-393645137_0", 'lane7b':"-393645137_1", 'lane8':"-393645126_0", 'lane9':"-393645126_2",
+        'lane10':"-393645126_1", 'lane11a':"393645138_0", 'lane11b':"393645138_1", 'lane12':"393645129_0",
         'lane13':"393645129_2", 'lane14':"393645129_1"
     }
 
@@ -40,7 +40,7 @@ def make_func_edge(isHaltingNumber):
         return lambda x: traci.edge.getLastStepHaltingNumber(x)
     else:
         return lambda x: traci.edge.getLastStepVehicleNumber(x)
-
+#lambda is a way to write a function in statement in one line; saves time to return x
 
 def get_vehicle_count(func_lane, func_edge):
     # W0, W1
@@ -54,17 +54,25 @@ def get_vehicle_count(func_lane, func_edge):
     # E2
     EL = func_lane(global_consts.Lanes['lane6'])
     # N0, N1
-    NT = func_edge(global_consts.Lanes['lane7']) + \
-         func_lane(global_consts.Lanes['lane8'])
-    # N2
-    NL = func_lane(global_consts.Lanes['lane9']) + \
+    NT = func_lane(global_consts.Lanes['lane7a']) + \
+         func_lane(global_consts.Lanes['lane8']) + \
          func_lane(global_consts.Lanes['lane10'])
+    if (func_lane(global_consts.Lanes['lane10']) >= 5):
+        NT += func_lane(global_consts.Lanes['lane7b'])
+    # N2
+    NL = func_lane(global_consts.Lanes['lane9'])
+    if (func_lane(global_consts.Lanes['lane9']) >= 5):
+        NL += func_lane(global_consts.Lanes['lane7b'])
     # S0, S1
-    ST = func_edge(global_consts.Lanes['lane11']) + \
-         func_lane(global_consts.Lanes['lane12'])
-    # S2
-    SL = func_lane(global_consts.Lanes['lane13']) + \
+    ST = func_lane(global_consts.Lanes['lane11a']) + \
+         func_lane(global_consts.Lanes['lane12']) + \
          func_lane(global_consts.Lanes['lane14'])
+    if (func_lane(global_consts.Lanes['lane14']) >= 5):
+        ST += func_lane(global_consts.Lanes['lane11b'])
+    # S2
+    SL = func_lane(global_consts.Lanes['lane13'])
+    if (func_lane(global_consts.Lanes['lane13']) >= 5):
+        NL += func_lane(global_consts.Lanes['lane11b'])
 
     return WT, WL, ET, EL, NT, NL, ST, SL
 
@@ -141,7 +149,7 @@ def go_to_phase_that_has_halted_cars(action):
          max_iteration += 1
     return action
 
-def get_state(detectorIDs, phase_time, passed):
+def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
     state = []
     # halted in each direction (12 vals)
     for detector in detectorIDs:
@@ -161,6 +169,24 @@ def get_state(detectorIDs, phase_time, passed):
     halt = traci.lane.getLastStepHaltingNumber("-393645137_1")
     state.append(halt)
 
+    #change to match logic for cars halted
+    behind = traci.lane.getLastStepVehicleNumber("-393625777_0") + traci.lane.getLastStepVehicleNumber("-393625777_1")
+    state.append(behind)
+    behind = traci.lane.getLastStepVehicleNumber("-393625777_2")
+    state.append(behind)  
+    behind = traci.lane.getLastStepVehicleNumber("393627613_0") + traci.lane.getLastStepVehicleNumber("393627613_1")
+    state.append(behind)
+    behind = traci.lane.getLastStepVehicleNumber("393627613_2")
+    state.append(behind)
+    behind = traci.edge.getLastStepVehicleNumber("-393645137") + traci.lane.getLastStepVehicleNumber("-393645126_0") + traci.lane.getLastStepVehicleNumber("-393645126_1")
+    state.append(behind)
+    behind = traci.lane.getLastStepVehicleNumber("-393645126_2")
+    state.append(behind)
+    behind = traci.edge.getLastStepVehicleNumber("393645138") + traci.lane.getLastStepVehicleNumber("393645129_0") + traci.lane.getLastStepVehicleNumber("393645129_1")
+    state.append(behind)
+    behind = traci.lane.getLastStepVehicleNumber("393645129_2")
+    state.append(behind)
+    
     # current phase (1 val)
     curr_phase = traci.trafficlights.getPhase(global_consts.TrafficLightId)
     state.append(curr_phase)
@@ -174,6 +200,11 @@ def get_state(detectorIDs, phase_time, passed):
     rate = cars_passed / phase_time
     state.append(rate)
 
+    state.append(halted_delta)
+
+    state.append(passed_delta)
+ 
+    #print (state)
     state = np.array(state)
     state = state.reshape((1, state.shape[0]))
 
