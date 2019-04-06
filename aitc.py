@@ -128,28 +128,6 @@ def cars_passed(passed):
                 cars_passed += 1
     return cars_passed
 
-#def calc_reward(old_halt, new_halt, new_passed, reward_factor):
-    # passed should be high, new_halt should be less
-    # old_halt - new_halt should be positive
-
-    # passed = new_passed * reward_factor
-    # change = old_halt - new_halt
-    # reward = 0
-    # if(passed == 0 ):
-    #     if(new_halt == 0):
-    #         reward = 100
-    #     else:
-    #         reward = - new_halt
-    # else:
-    #     if(new_halt == 0):
-    #         reward = 100 + 16 * passed
-    #     elif(change > 0):
-    #         reward = 4 * passed
-    #     elif(change == 0):
-    #         reward = passed
-    #     else:
-    #         reward = change
-    #return reward
 
 def calc_reward(old_halt, new_halt, new_passed, reward_factor):
     passed = new_passed
@@ -167,10 +145,8 @@ def calc_reward(old_halt, new_halt, new_passed, reward_factor):
             reward = 4 * passed
         elif(change == 0):
             reward = passed
-        elif(old_halt < new_halt):
+        elif(change < 0):
             reward = change
-        else:
-            reward = - new_halt
     return reward
 
 
@@ -226,8 +202,10 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
     traci.start(cmd)
     # passed = cars_passed(0)
     passed = 0
+    halted_delta = 0
+    passed_delta = 0
     detectorIDs = traci.inductionloop.getIDList()
-    state = get_state(detectorIDs, phase_time, passed)
+    state = get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta)
     go = True
     predictor_count = 0
     total_halt = 0
@@ -261,10 +239,11 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         new_halt = num_cars_halted_other_directions(curr_phase)
         old_halt = new_halt
-        if (passed/(phase_time + 1) < 0.1 and phase_time > 35) or (phase_time >= 7 and passed == 0) or phase_time > 50:
-            new_phase = curr_phase + 2
-            if new_phase == 16:
-                new_phase = 0
+        if options.check == 1:
+            if (passed/(phase_time + 1) < 0.1 and phase_time > 35) or (phase_time >= 7 and passed == 0) or phase_time > 50:
+                new_phase = curr_phase + 2
+                if new_phase == 16:
+                    new_phase = 0
 
         if(phase_changed):
             passed = 0
@@ -284,7 +263,9 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         new_passed = passed - old_passed
         new_halt = num_cars_halted_other_directions(curr_phase)
-        next_state = get_state(detectorIDs, phase_time, passed)
+        halted_delta = old_halt-new_halt # positive is better
+        passed_delta = new_passed # positive is better
+        next_state = get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta)
         reward_factor = 1
         if(options.mapfile == ""):
             # Changing traffic pattern
@@ -297,7 +278,8 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
                options.world_record[sim_batch] = new_passed
 
         reward = calc_reward(old_halt, new_halt, new_passed, reward_factor)
-
+        #reward = (halted_delta)+(1.5*(passed_delta))
+        
         total_passed += new_passed
         total_reward += reward
 
