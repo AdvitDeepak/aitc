@@ -157,42 +157,49 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
         halt = traci.lane.getLastStepHaltingNumber(lane)
         state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber("393645138_0")
+    halt = traci.lane.getLastStepHaltingNumber('lane11a')
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber("393645138_1")
+    halt = traci.lane.getLastStepHaltingNumber('lane11b')
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber("-393645137_0")
+    halt = traci.lane.getLastStepHaltingNumber('lane7a')
     state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber("-393645137_1")
+    halt = traci.lane.getLastStepHaltingNumber('lane7b')
     state.append(halt)
 
     #change to match logic for cars halted
-    behind = traci.lane.getLastStepVehicleNumber("-393625777_0") + traci.lane.getLastStepVehicleNumber("-393625777_1")
+    behind = traci.lane.getLastStepVehicleNumber('lane1') + traci.lane.getLastStepVehicleNumber('lane2')
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber("-393625777_2")
-    state.append(behind)  
-    behind = traci.lane.getLastStepVehicleNumber("393627613_0") + traci.lane.getLastStepVehicleNumber("393627613_1")
+    behind = traci.lane.getLastStepVehicleNumber('lane3')
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber("393627613_2")
+    behind = traci.lane.getLastStepVehicleNumber('lane4') + traci.lane.getLastStepVehicleNumber('lane5')
     state.append(behind)
-    behind = traci.edge.getLastStepVehicleNumber("-393645137") + traci.lane.getLastStepVehicleNumber("-393645126_0") + traci.lane.getLastStepVehicleNumber("-393645126_1")
+    behind = traci.lane.getLastStepVehicleNumber('lane6')
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber("-393645126_2")
+    behind = traci.lane.getLastStepVehicleNumber('lane7a') + traci.lane.getLastStepVehicleNumber('lane8') + traci.lane.getLastStepVehicleNumber('lane10')
+    if (traci.lane.getLastStepVehicleNumber('lane10') >= 5):
+        behind += traci.lane.getLastStepVehicleNumber('lane7b')
     state.append(behind)
-    behind = traci.edge.getLastStepVehicleNumber("393645138") + traci.lane.getLastStepVehicleNumber("393645129_0") + traci.lane.getLastStepVehicleNumber("393645129_1")
+    behind = traci.lane.getLastStepVehicleNumber('lane9')
+    if (traci.lane.getLastStepVehicleNumber('lane9') >= 5):
+        behind += traci.lane.getLastStepVehicleNumber('lane7b')
     state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber("393645129_2")
+    behind = traci.edge.getLastStepVehicleNumber('lane11a') + traci.lane.getLastStepVehicleNumber('lane12') + traci.lane.getLastStepVehicleNumber('lane14')
+    if (traci.lane.getLastStepVehicleNumber('lane14') >= 5):
+        behind += traci.lane.getLastStepVehicleNumber('lane11b')
     state.append(behind)
-    
+    behind = traci.lane.getLastStepVehicleNumber('lane13')
+    if (traci.lane.getLastStepVehicleNumber('lane13') >= 5):
+        behind += traci.lane.getLastStepVehicleNumber('lane11b')
+    state.append(behind)
+
     # current phase (1 val)
     curr_phase = traci.trafficlights.getPhase(global_consts.TrafficLightId)
     state.append(curr_phase)
 
     # elapsedTime (1 val)
-    #print("Elapsed:", phase_time)
     state.append(phase_time)
 
     # rateGoing (1 val)
@@ -203,8 +210,7 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
     state.append(halted_delta)
 
     state.append(passed_delta)
- 
-    #print (state)
+
     state = np.array(state)
     state = state.reshape((1, state.shape[0]))
 
@@ -226,7 +232,7 @@ def fail_safe(new_action, action, phase_time):
         #print("Debug1: New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} \n".format(new_halt, phase_time, curr_phase, action, new_action))
         return action
     cars_behindline_curr_phase = num_cars_behind_line(curr_phase)
-    if(cars_behindline_curr_phase == 0 and (num_cars_behind_line(new_action * 2) == 0)):
+    if(cars_behindline_curr_phase == 0 and (num_cars_behind_line(get_phase(new_action)) > 0)):
         final_action = go_to_phase_that_has_halted_cars(action)
         #print("Debug2: Cuur phase cars behind: {} New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} Final Action:{} \n".format(cars_behindline_curr_phase, new_halt, phase_time, curr_phase, action, new_action, final_action))
         return final_action
