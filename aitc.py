@@ -197,6 +197,15 @@ def getSumoCmd(options):
             cmd = global_consts.SumoCmd_GUI
     return cmd
 
+def filter_action(options, action, new_action, phase_time):
+    if(options.mode == "training"):
+        return new_action
+
+    if options.check == 1:
+        return fail_safe(new_action, action, phase_time)
+
+    return new_action
+
 def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
     phase_time = 1
@@ -222,13 +231,8 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         sim_batch = int(sim_step / options.runstep)
         new_action = agent.act(state, action)
-        if(options.model == "fixed"):
-            action = new_action
-        else:
-            if options.check == 1:
-                    action = fail_safe(new_action, action, phase_time)
-            else:
-                action = new_action
+
+        action = filter_action(options, action, new_action, phase_time)
 
         if(agent.predicting() == True):
             predictor_count = predictor_count + 1
