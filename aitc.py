@@ -31,15 +31,16 @@ class Options:
         self.log = ""
         self.verbosity = 1
         self.check = 1
+        self.reward_function = "maxpass_minhalt"
 
         self.debug=False
         self.log_handle = None
         self.mode = "demo"
         self.epochs = 0
-        self.world_record = ()
 
     def parse(self):
         self.cmdParser.add_argument("-m", "--model", choices=["fixed", "dqn", "ddqn", "ddpg"], default="dqn", help="Specify neural network model types to use for AI Traffic Controller")
+        self.cmdParser.add_argument("-g", "--reward_function", choices=["maxpass", "minhalt", "maxpass_minhalt"], default="maxpass_minhalt", help="Specify reward function for Training")
         #self.cmdParser.add_argument("-b", "--benchmark", action="store_true", help="If specified, run fixed model vs dqn|ddqn|ddpg model for same traffic pattern")
         self.cmdParser.add_argument("-b", "--benchmark", type=int, default=0, help="If specified, run fixed model vs dqn|ddqn|ddpg model for same traffic pattern for given number of iterations")
 
@@ -58,6 +59,7 @@ class Options:
         self.cmdParser.add_argument("-v", "--verbosity", type=int, choices=[0, 1, 2, 3], default=1, help="Set verbosity level. 0: silent, 1: benchmark, 2: stats: 3: details")
         self.cmdParser.add_argument("-c", "--check", type=int, choices=[0, 1], default=1, help="Set fail safe check level: 0 = disable, 1 = enable")
 
+
         self.args = self.cmdParser.parse_args()
 
         self.model = self.args.model
@@ -72,8 +74,7 @@ class Options:
         self.log = self.args.log
         self.verbosity = self.args.verbosity
         self.check = self.args.check
-
-        self.world_record = np.full(int(self.run/self.runstep + 1), 0)
+        self.reward_function = self.args.reward_function
 
         if(self.train > 0):
             self.mode = "training"
@@ -129,8 +130,7 @@ def cars_passed(passed):
                 cars_passed += 1
     return cars_passed
 
-
-def calc_reward(old_halt, new_halt, new_passed, reward_factor):
+def calc_reward_maxpass_minhalt(old_halt, new_halt, new_passed):
     passed = new_passed
     change = old_halt - new_halt
     reward = 0
@@ -148,6 +148,34 @@ def calc_reward(old_halt, new_halt, new_passed, reward_factor):
             reward = passed
         elif(change < 0):
             reward = change
+    return reward
+
+def calc_reward_maxpass(old_halt, new_halt, new_passed):
+    passed = new_passed
+    change = old_halt - new_halt
+    reward = -1
+    if(passed > 0 ):
+        reward = 8 * passed
+    return reward
+
+def calc_reward_minhalt(old_halt, new_halt, new_passed):
+    passed = new_passed
+    change = old_halt - new_halt
+    reward = 0
+    if(change > 0):
+        reward = 1
+    elif(change < 0):
+        reward = -1
+    return reward
+
+def calc_reward(options, old_halt, new_halt, new_passed):
+    reward = 0
+    if(options.reward_function == "maxpass_minhalt"):
+        reward = calc_reward_maxpass_minhalt(old_halt, new_halt, new_passed)
+    elif(options.reward_function == "maxpass"):
+        reward = calc_reward_maxpass(old_halt, new_halt, new_passed)
+    else:
+        reward = calc_reward_minhalt(old_halt, new_halt, new_passed)
     return reward
 
 
@@ -198,13 +226,17 @@ def getSumoCmd(options):
     return cmd
 
 def filter_action(options, action, new_action, phase_time):
+    final_action = new_action
     if(options.mode == "training"):
+        #print("Training NA:{} A:{} T:{}", new_action, action, phase_time)
         return new_action
 
     if options.check == 1:
-        return fail_safe(new_action, action, phase_time)
+        #print("Check=1: NA:{} A:{} T:{}".format(new_action, action, phase_time))
+        final_action = fail_safe(new_action, action, phase_time)
 
-    return new_action
+    #print("Def NA:{} A:{} FA:{} T:{}".format(new_action, action, final_action, phase_time))
+    return final_action
 
 def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
@@ -231,8 +263,9 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         sim_batch = int(sim_step / options.runstep)
         new_action = agent.act(state, action)
-
+        #print("Before filter: A:{} NA:{} T:{}".format(action, new_action, phase_time))
         action = filter_action(options, action, new_action, phase_time)
+        #print("After filter: A:{} NA:{} T:{}".format(action, new_action, phase_time))
 
         if(agent.predicting() == True):
             predictor_count = predictor_count + 1
@@ -266,20 +299,7 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
         halted_delta = old_halt-new_halt # positive is better
         passed_delta = new_passed # positive is better
         next_state = get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta)
-        reward_factor = 1
-        if(options.mapfile == ""):
-            # Changing traffic pattern
-            reward_factor = 1
-        else:
-            #Fixed traffic pattern
-            # Use world record to award more for beating the record
-            reward_factor = (new_passed + 1)/(options.world_record[sim_batch] + 1)
-            if (new_passed > options.world_record[sim_batch]):
-               options.world_record[sim_batch] = new_passed
-
-        reward = calc_reward(old_halt, new_halt, new_passed, reward_factor)
-        #reward = (halted_delta)+(1.5*(passed_delta))
-
+        reward = calc_reward(options, old_halt, new_halt, new_passed)
         total_passed += new_passed
         total_reward += reward
 
@@ -290,7 +310,6 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
                 options.log_handle.write("Phase Time:{} Car Passed:{} Predictor:{} Action:{} \n".format(phase_time, new_passed, agent.predicting(), action))
             if(options.verbosity > 2):
                 options.log_handle.write("State:{} \nNext State:{}\nQ Table:{}\n".format(tuple(state), tuple(next_state), tuple(agent.getQTable())))
-                options.log_handle.write("World Records: {}\n".format(options.world_record))
         # End debugging log
 
         if(options.mode == "training"):

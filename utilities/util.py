@@ -27,7 +27,7 @@ class global_consts:
         'lane10':"-393645126_1", 'lane11a':"393645138_0", 'lane11b':"393645138_1", 'lane12':"393645129_0",
         'lane13':"393645129_2", 'lane14':"393645129_1"
     }
-    MaxPhaseTime = 50
+    MaxPhaseTime = 500
 
 
 def make_func_lane(isHaltingNumber):
@@ -207,9 +207,10 @@ def fail_safe(new_action, action, phase_time):
         #print("Debug1: New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} \n".format(new_halt, phase_time, curr_phase, action, new_action))
         return action
     cars_behindline_curr_phase = num_cars_my_direction_line(curr_phase)
-    if(cars_behindline_curr_phase == 0 and (num_cars_my_direction_line(get_phase(new_action)) > 0)) or phase_time > global_consts.MaxPhaseTime:
+    #print("Debug2: Cuur phase cars behind: {} New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} \n".format(cars_behindline_curr_phase, new_halt, phase_time, curr_phase, action, new_action))
+    if( (cars_behindline_curr_phase == 0 and new_halt > 0) or (phase_time > global_consts.MaxPhaseTime) ):
         final_action = go_to_phase_that_has_halted_cars(action)
-        #print("Debug2: Cuur phase cars behind: {} New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} Final Action:{} \n".format(cars_behindline_curr_phase, new_halt, phase_time, curr_phase, action, new_action, final_action))
+        #print("Debug3: Cuur phase cars behind: {} New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} Final Action:{} \n".format(cars_behindline_curr_phase, new_halt, phase_time, curr_phase, action, new_action, final_action))
         return final_action
 
     #print("Debug3: New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} \n".format(new_halt, phase_time, curr_phase, action, new_action))
