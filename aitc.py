@@ -216,6 +216,7 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
     phase_time = 0
     action = 0
     new_action = 0
+    new_halt = 0
 
     while sim_step < options.run and go:
 
@@ -238,7 +239,6 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
         if(curr_phase != new_phase):
             phase_changed = True
 
-        new_halt = num_cars_halted_other_directions(curr_phase)
         old_halt = new_halt
 
         if(phase_changed):

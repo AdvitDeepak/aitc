@@ -9,7 +9,7 @@ class global_consts:
     SumoConfig = "data/map.sumocfg"
     SumoCmd = ["sumo", "-c", SumoConfig, "--tripinfo-output", "data/tripinfo.xml",  "--start", "--no-warnings", "--time-to-teleport", "-1"]
     SumoCmd_GUI = ["sumo-gui", "-c", SumoConfig, "--tripinfo-output", "data/tripinfo.xml",  "--no-warnings", "--time-to-teleport", "-1"]
-    StateSize = 29
+    StateSize = 21
     ActionSize = 8
     PhaseToActionRatio = 2
     MaxNumVehicleSeed = 400
@@ -45,33 +45,33 @@ def make_func_edge(isHaltingNumber):
 
 def get_vehicle_count(func_lane, func_edge):
     # W0, W1
-    WT = func_lane(global_consts.Lanes['lane1']) + \
+    ET = func_lane(global_consts.Lanes['lane1']) + \
          func_lane(global_consts.Lanes['lane2'])
     # W2
-    WL = func_lane(global_consts.Lanes['lane3'])
+    EL = func_lane(global_consts.Lanes['lane3'])
     # E0, E1
-    ET = func_lane(global_consts.Lanes['lane4']) + \
+    WT = func_lane(global_consts.Lanes['lane4']) + \
          func_lane(global_consts.Lanes['lane5'])
     # E2
-    EL = func_lane(global_consts.Lanes['lane6'])
+    WL = func_lane(global_consts.Lanes['lane6'])
     # N0, N1
-    NT = func_lane(global_consts.Lanes['lane7a']) + \
+    ST = func_lane(global_consts.Lanes['lane7a']) + \
          func_lane(global_consts.Lanes['lane8']) + \
          func_lane(global_consts.Lanes['lane10'])
     if (func_lane(global_consts.Lanes['lane10']) >= 5):
-        NT += func_lane(global_consts.Lanes['lane7b'])
+        ST += func_lane(global_consts.Lanes['lane7b'])
     # N2
-    NL = func_lane(global_consts.Lanes['lane9'])
+    SL = func_lane(global_consts.Lanes['lane9'])
     if (func_lane(global_consts.Lanes['lane9']) >= 5):
-        NL += func_lane(global_consts.Lanes['lane7b'])
+        SL += func_lane(global_consts.Lanes['lane7b'])
     # S0, S1
-    ST = func_lane(global_consts.Lanes['lane11a']) + \
+    NT = func_lane(global_consts.Lanes['lane11a']) + \
          func_lane(global_consts.Lanes['lane12']) + \
          func_lane(global_consts.Lanes['lane14'])
     if (func_lane(global_consts.Lanes['lane14']) >= 5):
-        ST += func_lane(global_consts.Lanes['lane11b'])
+        NT += func_lane(global_consts.Lanes['lane11b'])
     # S2
-    SL = func_lane(global_consts.Lanes['lane13'])
+    NL = func_lane(global_consts.Lanes['lane13'])
     if (func_lane(global_consts.Lanes['lane13']) >= 5):
         NL += func_lane(global_consts.Lanes['lane11b'])
 
@@ -92,7 +92,7 @@ def get_halted_in_each_direction():
     WT, WL, ET, EL, NT, NL, ST, SL = get_vehicle_count(func_lane, func_edge)
     return WT, WL, ET, EL, NT, NL, ST, SL
 
-def num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL):
+def num_cars_my_direction(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL):
     cars_behind = 0
     if curr_phase % global_consts.PhaseToActionRatio == 1:
         curr_phase = curr_phase - 1
@@ -105,13 +105,13 @@ def num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL):
     elif curr_phase == 6:
         cars_behind = NT + ST
     elif curr_phase == 8:
-        cars_behind = ET + EL
-    elif curr_phase == 10:
-        cars_behind = ST + SL
-    elif curr_phase == 12:
         cars_behind = WT + WL
-    elif curr_phase == 14:
+    elif curr_phase == 10:
         cars_behind = NT + NL
+    elif curr_phase == 12:
+        cars_behind = ET + EL
+    elif curr_phase == 14:
+        cars_behind = ST + SL
     return cars_behind
 
 # The phase for which light is on, cars are moving, so do
@@ -119,18 +119,22 @@ def num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL):
 def num_cars_halted_other_directions(curr_phase):
     WT, WL, ET, EL, NT, NL, ST, SL = get_halted_in_each_direction()
     total = WT + WL + ET + EL + NT + NL + ST + SL
-    cars_behind = num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
+    cars_behind = num_cars_my_direction(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
     cars_behind = total - cars_behind
+
+    #print("WT {} WL {} ET {} EL {} NT {} NL {} ST {} SL {} | P {} Behind other {}".format(WT, WL, ET, EL, NT, NL, ST, SL, curr_phase, cars_behind ))
+
     return cars_behind
 
-def num_cars_behind_line(curr_phase):
+def num_cars_my_direction_line(curr_phase):
     WT, WL, ET, EL, NT, NL, ST, SL = get_vehicle_in_each_direction()
-    cars_behind = num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
+    cars_behind = num_cars_my_direction(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
     return cars_behind
 
 def num_cars_halted_line(curr_phase):
     WT, WL, ET, EL, NT, NL, ST, SL = get_halted_in_each_direction()
-    cars_behind = num_cars_behind(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
+    cars_behind = num_cars_my_direction(curr_phase, WT, WL, ET, EL, NT, NL, ST, SL)
+    #print("NCHL WT {} WL {} ET {} EL {} NT {} NL {} ST {} SL {} | P {} Behind {}".format(WT, WL, ET, EL, NT, NL, ST, SL, curr_phase, cars_behind))
     return cars_behind
 
 def get_phase(action):
@@ -143,58 +147,24 @@ def increment_action(action, by_count):
 def go_to_phase_that_has_halted_cars(action):
 
     max_iteration = 0
+    #print("BEFORE Num_cars_halted:{} Action:{} Max_Iteration:{}\n".format(num_cars_halted_line(get_phase(action)), action, max_iteration))
     while (num_cars_halted_line(get_phase(action)) == 0 and max_iteration < global_consts.ActionSize):
 
          action = increment_action(action, 1)
-         #print("Loop:{} Action:{} \n".format(num_cars_halted_line(get_phase(action)), action))
+         #print("Num_cars_halted:{} Action:{} Max_Iteration:{}\n".format(num_cars_halted_line(get_phase(action)), action, max_iteration))
          max_iteration += 1
     return action
 
 def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
     state = []
-    # halted in each direction (12 vals)
-    for detector in detectorIDs:
-        lane = traci.inductionloop.getLaneID(detector)
-        halt = traci.lane.getLastStepHaltingNumber(lane)
-        state.append(halt)
 
-    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane11a'])
-    state.append(halt)
+    # halted in each direction (8 vals)
+    WTh, WLh, ETh, ELh, NTh, NLh, STh, SLh = get_halted_in_each_direction()
+    state.extend([WTh, WLh, ETh, ELh, NTh, NLh, STh, SLh])
 
-    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane11b'])
-    state.append(halt)
-
-    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane7a'])
-    state.append(halt)
-
-    halt = traci.lane.getLastStepHaltingNumber(global_consts.Lanes['lane7b'])
-    state.append(halt)
-
-    #change to match logic for cars halted
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane1']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane2'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane3'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane4']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane5'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane6'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane8']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane10'])
-    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane10']) >= 5):
-        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7b'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane9'])
-    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane9']) >= 5):
-        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane7b'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane11a']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane12']) + traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14'])
-    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane14']) >= 5):
-        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13'])
-    state.append(behind)
-    behind = traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13'])
-    if (traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane13']) >= 5):
-        behind += traci.lane.getLastStepVehicleNumber(global_consts.Lanes['lane11b'])
-    state.append(behind)
+    # total vehicles in each direction (8 vals)
+    WT, WL, ET, EL, NT, NL, ST, SL = get_vehicle_in_each_direction()
+    state.extend([WT, WL, ET, EL, NT, NL, ST, SL])
 
     # current phase (1 val)
     curr_phase = traci.trafficlights.getPhase(global_consts.TrafficLightId)
@@ -208,10 +178,13 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
     rate = cars_passed / phase_time
     state.append(rate)
 
+    # the change in the number of cars halted (1 val)
     state.append(halted_delta)
 
+    # the change in the number of cars passed (1 val)
     state.append(passed_delta)
 
+    #print("WTh {} WLh {} ETh {} ELh {} NTh {} NLh {} STh {} SLh {} | WT {} WL {} ET {} EL {} NT {} NL {} ST {} SL {} | P {} Time {} Rate {} dHalt {} dPass {}".format(WTh, WLh, ETh, ELh, NTh, NLh, STh, SLh, WT, WL, ET, EL, NT, NL, ST, SL, curr_phase, phase_time, rate, halted_delta, passed_delta ))
     state = np.array(state)
     state = state.reshape((1, state.shape[0]))
 
@@ -233,8 +206,8 @@ def fail_safe(new_action, action, phase_time):
         # There is no car in other directions, keep current phase
         #print("Debug1: New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} \n".format(new_halt, phase_time, curr_phase, action, new_action))
         return action
-    cars_behindline_curr_phase = num_cars_behind_line(curr_phase)
-    if(cars_behindline_curr_phase == 0 and (num_cars_behind_line(get_phase(new_action)) > 0)) or phase_time > global_consts.MaxPhaseTime:
+    cars_behindline_curr_phase = num_cars_my_direction_line(curr_phase)
+    if(cars_behindline_curr_phase == 0 and (num_cars_my_direction_line(get_phase(new_action)) > 0)) or phase_time > global_consts.MaxPhaseTime:
         final_action = go_to_phase_that_has_halted_cars(action)
         #print("Debug2: Cuur phase cars behind: {} New halted: {} phase_time: {} current phase:{} Action:{} New Action:{} Final Action:{} \n".format(cars_behindline_curr_phase, new_halt, phase_time, curr_phase, action, new_action, final_action))
         return final_action
