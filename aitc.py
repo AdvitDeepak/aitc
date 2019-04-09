@@ -30,7 +30,7 @@ class Options:
         self.switch_factor = 1
         self.log = ""
         self.verbosity = 1
-        self.check = 1
+        self.check = 0
         self.reward_function = "maxpass_minhalt"
 
         self.debug=False
@@ -57,7 +57,7 @@ class Options:
         self.cmdParser.add_argument("-f", "--fixed_switch_factor", type=int, default=16, help="Specify a factor of runstep by which fixed traffic light state should switch")
         self.cmdParser.add_argument("-l", "--log", default="", help="Specify log file name")
         self.cmdParser.add_argument("-v", "--verbosity", type=int, choices=[0, 1, 2, 3], default=1, help="Set verbosity level. 0: silent, 1: benchmark, 2: stats: 3: details")
-        self.cmdParser.add_argument("-c", "--check", type=int, choices=[0, 1], default=1, help="Set fail safe check level: 0 = disable, 1 = enable")
+        self.cmdParser.add_argument("-c", "--check", type=int, choices=[0, 1], default=0, help="Set fail safe check level: 0 = disable, 1 = enable")
 
 
         self.args = self.cmdParser.parse_args()
@@ -141,9 +141,9 @@ def calc_reward_maxpass_minhalt(old_halt, new_halt, new_passed):
             reward = - new_halt
     else:
         if(new_halt == 0):
-            reward = 8 * passed
-        elif(change > 0):
             reward = 4 * passed
+        elif(change > 0):
+            reward = 2 * passed
         elif(change == 0):
             reward = passed
         elif(change < 0):
@@ -155,7 +155,7 @@ def calc_reward_maxpass(old_halt, new_halt, new_passed):
     change = old_halt - new_halt
     reward = -1
     if(passed > 0 ):
-        reward = 8 * passed
+        reward = 2 * passed
     return reward
 
 def calc_reward_minhalt(old_halt, new_halt, new_passed):
@@ -225,19 +225,6 @@ def getSumoCmd(options):
             cmd = global_consts.SumoCmd_GUI
     return cmd
 
-def filter_action(options, action, new_action, phase_time):
-    final_action = new_action
-    if(options.mode == "training"):
-        #print("Training NA:{} A:{} T:{}", new_action, action, phase_time)
-        return new_action
-
-    if options.check == 1:
-        #print("Check=1: NA:{} A:{} T:{}".format(new_action, action, phase_time))
-        final_action = fail_safe(new_action, action, phase_time)
-
-    #print("Def NA:{} A:{} FA:{} T:{}".format(new_action, action, final_action, phase_time))
-    return final_action
-
 def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
     phase_time = 1
@@ -258,14 +245,19 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
     action = 0
     new_action = 0
     new_halt = 0
+    reward = 0
 
     while sim_step < options.run and go:
 
         sim_batch = int(sim_step / options.runstep)
         new_action = agent.act(state, action)
+        #print("State:{} action:{} new_action:{} phase time:{}".format(state[0], action, new_action, phase_time))
         #print("Before filter: A:{} NA:{} T:{}".format(action, new_action, phase_time))
-        action = filter_action(options, action, new_action, phase_time)
-        #print("After filter: A:{} NA:{} T:{}".format(action, new_action, phase_time))
+        if(options.mode == "demo" and options.check == 1):
+            action = fail_safe(new_action, action, phase_time)
+        else:
+            action = new_action
+        #print("After filter: A:{:d} NA:{:d} T:{:d}".format(action, new_action, phase_time))
 
         if(agent.predicting() == True):
             predictor_count = predictor_count + 1
@@ -299,9 +291,11 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
         halted_delta = old_halt-new_halt # positive is better
         passed_delta = new_passed # positive is better
         next_state = get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta)
-        reward = calc_reward(options, old_halt, new_halt, new_passed)
+        if(options.mode == "training"):
+            reward = calc_reward(options, old_halt, new_halt, new_passed)
+            total_reward += reward
+
         total_passed += new_passed
-        total_reward += reward
 
         # Debugging log
         if(options.debug):
@@ -314,9 +308,11 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
         if(options.mode == "training"):
             agent.remember(state, action, reward, next_state)
+
         state = next_state
         cars_left = traci.simulation.getMinExpectedNumber()
         if cars_left == 0:
+            #print("Carf left is zero")
             go = False
         # end while sim_step < options.run and go
 
@@ -333,10 +329,8 @@ def runSimulation(gen_map_sim_steps, cmd, simulation, options, agent):
 
     if(options.mode == "training"):
         agent.replay()
-
-
-    if (simulation % global_consts.WeightDumpInterval == 0) & (simulation != 0):
-        agent.save(global_consts.OutputDir + "./traffic" + repr(simulation) + ".h5")
+        if (simulation % global_consts.WeightDumpInterval == 0) & (simulation != 0):
+            agent.save(global_consts.OutputDir + "./traffic" + repr(simulation) + ".h5")
 
     return (sim_step, lost_time)
 
@@ -399,7 +393,10 @@ def runBenchMark(options, cmd):
     bm_h.close()
 
 def initialize():
-    #parse commandline
+    np.set_printoptions(linewidth=320)
+    np.set_printoptions(precision=2, suppress=True)
+    np.set_printoptions(formatter={'float': '{: 8.2f}'.format})
+    np.set_printoptions(formatter={'int': '{: 8d}'.format})
     options = Options()
     options.parse()
     if(options.verbosity > 0):
@@ -416,6 +413,7 @@ def finalize(options):
 
 
 def main():
+
     options = initialize()
     cmd = getSumoCmd(options)
     if(options.benchmark > 0):

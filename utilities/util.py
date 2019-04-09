@@ -186,7 +186,9 @@ def get_state(detectorIDs, phase_time, passed, halted_delta, passed_delta):
 
     #print("WTh {} WLh {} ETh {} ELh {} NTh {} NLh {} STh {} SLh {} | WT {} WL {} ET {} EL {} NT {} NL {} ST {} SL {} | P {} Time {} Rate {} dHalt {} dPass {}".format(WTh, WLh, ETh, ELh, NTh, NLh, STh, SLh, WT, WL, ET, EL, NT, NL, ST, SL, curr_phase, phase_time, rate, halted_delta, passed_delta ))
     state = np.array(state)
+    #print("State:{} Shape:{}".format(state, state.shape[0]))
     state = state.reshape((1, state.shape[0]))
+    #print("State after reshape:{} Shape:{}".format(state, state.shape[0]))
 
     return state
 

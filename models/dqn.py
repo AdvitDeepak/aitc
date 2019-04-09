@@ -7,6 +7,7 @@ import random
 from keras.optimizers import Adam
 import h5py
 import os
+from utilities.util import global_consts
 
 
 
@@ -24,8 +25,8 @@ class Dqn:
         self.memory = deque(maxlen=2000)
         self.batch_size = 200
         self.gamma = 0.94
-        self.predictor = False;
-        self.predictor_action =[];
+        self.predictor = False
+        self.predictor_action = np.zeros((1,self.state_size))
 
 
     def _build_model(self):
@@ -65,24 +66,32 @@ class Dqn:
             action = np.random.choice(range(self.action_size))
             self.predictor = False
         else:
+            #print("Predictor:  state:{}".format(state))
+            #print("Prediction direct:{}".format(self.regressor.predict(state)))
             self.predictor_action = self.regressor.predict(state)
+            #print("Prediction action:{}".format(self.predictor_action))
             action = np.argmax(self.predictor_action, axis=1)[0]
             self.predictor = True
         return action
 
     def remember(self, state, action, reward, next_state):
+        #print("Remmeber: s:{} a:{} r:{} ns:{}".format(state, action, reward, next_state))
         self.memory.append((state, action, reward, next_state))
 
     def replay(self):
         #print(repr(self.memory))
         if len(self.memory) < self.batch_size:
+            print ("Not enough data to train dqn model. batch size:{} memory size:{}".format(self.batch_size, len(self.memory)))
             return
         minibatch = random.sample(list(self.memory), self.batch_size)
         for state, action, reward, next_state in minibatch:
             target = reward + self.gamma*np.max(self.regressor.predict(next_state)[0])
             target_f = self.regressor.predict(state)
+            #print("action:{:d} reward:{:d} target:{:6.2f}".format(action, reward, target))
+            #print("target_f before:{}".format(target_f[0]))
             self.predictor_action = target_f
             target_f[0][action] = target
+            #print(" target_f after:{}".format(target_f[0]))
             self.regressor.fit(state, target_f, epochs=1, verbose=0)
         if self.exploration > self.min_exploration:
             self.exploration *= self.exploration_decay
