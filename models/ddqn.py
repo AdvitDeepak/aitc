@@ -11,7 +11,7 @@ from utilities.util import global_consts
 
 
 
-class Dqn:
+class Ddqn:
     def __init__(self, state_space_size, action_space_size, exploration, log_handle):
         self.state_size = state_space_size
         self.action_size = action_space_size

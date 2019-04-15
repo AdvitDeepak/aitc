@@ -11,14 +11,12 @@ from utilities.util import global_consts
 
 
 
-class Dqn:
+class Qtable:
     def __init__(self, state_space_size, action_space_size, exploration, log_handle):
         self.state_size = state_space_size
         self.action_size = action_space_size
+        self.halt_state_size = 5
         self.learning_rate = 0.001
-        self.firstHidden = 604
-        self.secondHidden = 1166
-        self.regressor = self._build_model()
         self.exploration = exploration
         self.exploration_decay = 0.999995
         self.min_exploration = 0.01
@@ -28,27 +26,16 @@ class Dqn:
         self.predictor = False
         self.predictor_action = np.zeros((1,self.state_size))
         self.log_handle = log_handle
+        self.tabledim = (self.halt_state_size, self.halt_state_size, self.halt_state_size, self.halt_state_size, self.halt_state_size, \
+                        self.halt_state_size, self.halt_state_size, self.halt_state_size, self.action_size, self.action_size)
+        self.qtable = np.zeros(self.tabledim, dtype=np.float)
 
-
-    def _build_model(self):
-        #Ignore AVX2 warning
-        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-        regressor = Sequential()
-        #regressor.add(Dense(output_dim=self.firstHidden, input_dim=self.state_size, activation='relu'))
-        #regressor.add(Dense(output_dim=self.secondHidden, activation='relu'))
-        #regressor.add(Dense(output_dim=self.action_size, activation='linear'))
-        # Use Keras 2 API
-        regressor.add(Dense(input_dim=self.state_size, activation='relu', units=self.firstHidden))
-        regressor.add(Dense(activation='relu', units=self.secondHidden))
-        regressor.add(Dense(activation='linear', units=self.action_size))
-        regressor.compile(optimizer=Adam(lr=self.learning_rate), loss='mse')
-        return regressor
 
     def setMode(self, mode):
         self.exploration = mode
 
     def type(self):
-        return "dqn"
+        return "qtable"
 
     def getMode(self):
         return self.exploration

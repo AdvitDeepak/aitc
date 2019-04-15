@@ -3,6 +3,7 @@ import numpy as np
 import os, sys, time, traci, shutil, random, argparse
 from models.dqn import Dqn
 from models.fixed import Fixed
+from models.qtable import Qtable
 
 from utilities.led import led_demo
 from utilities.util import get_state
@@ -39,7 +40,7 @@ class Options:
         self.epochs = 0
 
     def parse(self):
-        self.cmdParser.add_argument("-m", "--model", choices=["fixed", "dqn", "ddqn", "ddpg"], default="dqn", help="Specify neural network model types to use for AI Traffic Controller")
+        self.cmdParser.add_argument("-m", "--model", choices=["fixed", "dqn", "ddqn", "qtable"], default="dqn", help="Specify neural network model types to use for AI Traffic Controller")
         self.cmdParser.add_argument("-g", "--reward_function", choices=["maxpass", "minhalt", "maxpass_minhalt"], default="maxpass_minhalt", help="Specify reward function for Training")
         #self.cmdParser.add_argument("-b", "--benchmark", action="store_true", help="If specified, run fixed model vs dqn|ddqn|ddpg model for same traffic pattern")
         self.cmdParser.add_argument("-b", "--benchmark", type=int, default=0, help="If specified, run fixed model vs dqn|ddqn|ddpg model for same traffic pattern for given number of iterations")
@@ -186,13 +187,12 @@ def createAgent(options, model):
         exploration = 1
 
     if(model == "dqn"):
-        agent = Dqn(global_consts.StateSize, global_consts.ActionSize, exploration)
+        agent = Dqn(global_consts.StateSize, global_consts.ActionSize, exploration, options.log_handle)
     elif(model == "ddqn"):
         print("Error: Model {} is not implemented yet".format(model))
         exit(1)
-    elif(model == "ddpg"):
-        print("Error: Model {} is not implemented yet".format(model))
-        exit(1)
+    elif(model == "qtable"):
+        agent = Qtable(global_consts.StateSize, global_consts.ActionSize, exploration, options.log_handle)
     elif(model == "fixed"):
         agent = Fixed(global_consts.StateSize, global_consts.ActionSize, options.switch_factor)
     else:
